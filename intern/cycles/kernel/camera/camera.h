@@ -338,6 +338,16 @@ ccl_device_inline void camera_sample_panorama(ccl_constant KernelCamera *cam,
 
 /* Common */
 
+ccl_device_inline void invert_ray(ccl_private Ray *ray)
+{
+  (ray->P).x += (ray->D).x * 100;
+  (ray->P).y += (ray->D).y * 100;
+  (ray->P).z += (ray->D).z * 100;
+  (ray->D).x = -(ray->D).x;
+  (ray->D).y = -(ray->D).y;
+  (ray->D).z = -(ray->D).z;
+}
+
 ccl_device_inline void camera_sample(KernelGlobals kg,
                                      int x,
                                      int y,
@@ -393,6 +403,7 @@ ccl_device_inline void camera_sample(KernelGlobals kg,
   /* sample */
   if (kernel_data.cam.type == CAMERA_PERSPECTIVE) {
     camera_sample_perspective(kg, raster, lens_uv, ray);
+    invert_ray(ray);
   }
   else if (kernel_data.cam.type == CAMERA_ORTHOGRAPHIC) {
     camera_sample_orthographic(kg, raster, lens_uv, ray);
